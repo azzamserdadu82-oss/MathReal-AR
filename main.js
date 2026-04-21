@@ -3,6 +3,32 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('MathReal-AR initialized');
     
+    // Mobile Menu Toggle
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const closeMenuBtn = document.getElementById('closeMenuBtn');
+    const mobileSidebar = document.getElementById('mobileSidebar');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+    function toggleSidebar(show) {
+        if (!mobileSidebar) return;
+        if (show) {
+            mobileSidebar.classList.remove('translate-x-full');
+            sidebarBackdrop.classList.remove('opacity-0');
+        } else {
+            mobileSidebar.classList.add('translate-x-full');
+            sidebarBackdrop.classList.add('opacity-0');
+        }
+    }
+
+    if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', () => toggleSidebar(true));
+    if (closeMenuBtn) closeMenuBtn.addEventListener('click', () => toggleSidebar(false));
+    if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', () => toggleSidebar(false));
+
+    // Lucide Icons
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+
     // Modal Logic
     const modal = document.getElementById('pdfModal');
     const closeBtn = document.getElementById('closeModal');
