@@ -39,7 +39,7 @@
         </div>
     </nav>
     <!-- Mobile Sidebar Menu Overlay -->
-    <div id="mobileSidebar" class="fixed inset-0 z-[100] transform translate-x-full transition-transform duration-500 md:hidden">
+    <div id="mobileSidebar" class="fixed inset-0 z-[100] transform translate-x-full invisible transition-transform duration-500 md:hidden">
         <!-- Backdrop -->
         <div id="sidebarBackdrop" class="absolute inset-0 bg-gray-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-500"></div>
         
@@ -126,21 +126,22 @@
                  </button>
             </div>
 
-            <!-- Viewer Area -->
+            <!-- Viewer Area (Heyzine Embed) -->
             <div id="viewerWrapper" class="bg-white rounded-3xl overflow-hidden shadow-inner h-[70vh] lg:h-[80vh] relative group border-4 border-gray-800">
                 
                 <!-- Loading State -->
-                <div id="viewerLoading" class="absolute inset-0 bg-white flex flex-col items-center justify-center z-20">
+                <div id="viewerLoading" class="absolute inset-0 bg-white flex flex-col items-center justify-center z-50 transition-opacity duration-300">
                     <div class="relative flex h-12 w-12 items-center justify-center">
                         <div class="animate-spin rounded-full h-10 w-10 border-4 border-indigo-600 border-t-transparent"></div>
                     </div>
-                    <p class="mt-4 text-[10px] font-black text-indigo-600 uppercase tracking-widest animate-pulse">Memuat Materi Digital...</p>
+                    <p class="mt-4 text-[10px] font-black text-indigo-600 uppercase tracking-widest animate-pulse">Menghubungkan ke Heyzine...</p>
                 </div>
 
-                <!-- Native Iframe Viewer (Bypasses CORS issues) -->
-                <iframe id="cinemaIframe" src="" 
-                        class="w-full h-full opacity-0 transition-opacity duration-700" 
-                        allow="autoplay"
+                <!-- Heyzine Iframe -->
+                <iframe id="heyzineIframe" 
+                        src="" 
+                        class="w-full h-full border-none opacity-0 transition-opacity duration-700" 
+                        allowfullscreen
                         onload="hideLoading()"></iframe>
             </div>
 
@@ -163,20 +164,20 @@
 
     <script>
         const modules = [
-            { id: '1', title: 'Buku Panduan FGAR', driveId: '18bsCo23MsfNMQIBL6qyNIW9EBWH3FQgI', img: 'cover_fgar.jpg' },
-            { id: '2', title: 'MathReal-AR MODEL', driveId: '1EabyDC8_8k4inbkflTFl3oUx3x21mJz-', img: 'cover_mathreal.jpg' },
-            { id: '3', title: 'Modul Guru BRSD', driveId: '1jC14Au6YF8keTSlmLpZSQX__FJRZC1QF', img: 'cover_brsd.jpg' },
-            { id: '4', title: 'Modul Siswa BRSD', driveId: '13DMzB7trNSO_MvF7scKtZgVAdHftxGr7', img: 'cover_brsd.jpg' },
-            { id: '5', title: 'Modul Guru Lingkaran', driveId: '1w0xVqo5ZtL_U6BevAz1yeqZRsRs_eo8q', img: 'cover_lingkaran.jpg' },
-            { id: '6', title: 'Modul Siswa Lingkaran', driveId: '1MLCouYB16qMtmlaBiBkPoo99rdXpzqDY', img: 'cover_lingkaran.jpg' },
-            { id: '7', title: 'Modul Guru Peluang', driveId: '1qo7vtX3zRqNn3k1xvH0e2l-VRvcD0yCA', img: 'cover_peluang.jpg' },
-            { id: '8', title: 'Modul Siswa Peluang', driveId: '1gJhZMDpOn-SfLox8BNPR1X4LtvdyEe5r', img: 'cover_peluang.jpg' }
+            { id: '1', title: 'Panduan FGAR', heyzineUrl: 'https://heyzine.com/flip-book/dd2a017422.html', img: 'cover_fgar.jpg' },
+            { id: '2', title: 'MathReal-AR MODEL', heyzineUrl: 'https://heyzine.com/flip-book/2d2e848e20.html', img: 'cover_mathreal.jpg' },
+            { id: '3', title: 'Guru BRSD', heyzineUrl: 'https://heyzine.com/flip-book/0131b780e5.html', img: 'cover_brsd.jpg' },
+            { id: '4', title: 'Siswa BRSD', heyzineUrl: 'https://heyzine.com/flip-book/0fa2c54b54.html', img: 'cover_brsd.jpg' },
+            { id: '5', title: 'Guru Lingkaran', heyzineUrl: 'https://heyzine.com/flip-book/dd2a017422.html', img: 'cover_lingkaran.jpg' },
+            { id: '6', title: 'Siswa Lingkaran', heyzineUrl: 'https://heyzine.com/flip-book/2d2e848e20.html', img: 'cover_lingkaran.jpg' },
+            { id: '7', title: 'Guru Peluang', heyzineUrl: 'https://heyzine.com/flip-book/fd14a4cfb2.html', img: 'cover_peluang.jpg' },
+            { id: '8', title: 'Siswa Peluang', heyzineUrl: 'https://heyzine.com/flip-book/cac2ae08a9.html', img: 'cover_peluang.jpg' }
         ];
 
         function renderGallery() {
             const container = document.getElementById('bookGallery');
             container.innerHTML = modules.map((m, i) => `
-                <button onclick="selectBook('${m.driveId}', '${m.title}', this)" 
+                <button onclick="selectBook('${m.heyzineUrl}', '${m.title}', this)" 
                         class="book-thumb-cinema flex-shrink-0 w-24 md:w-32 snap-center group">
                     <div class="aspect-[3/4] w-full bg-white rounded-2xl overflow-hidden border-4 border-transparent shadow-lg transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-indigo-200">
                         <img src="${m.img}" class="w-full h-full object-cover">
@@ -187,20 +188,21 @@
             lucide.createIcons();
         }
 
-        function selectBook(driveId, title, btnEl) {
+        function selectBook(heyzineUrl, title, btnEl) {
             // Update Active Thumb
             document.querySelectorAll('.book-thumb-cinema').forEach(b => b.classList.remove('active-thumb'));
             if(btnEl) btnEl.classList.add('active-thumb');
 
             // Reset Loading
             const loader = document.getElementById('viewerLoading');
-            const iframe = document.getElementById('cinemaIframe');
-            loader.classList.remove('hidden');
+            const iframe = document.getElementById('heyzineIframe');
+            
+            loader.classList.remove('hidden', 'opacity-0');
             iframe.classList.add('opacity-0');
 
             // Set Content
             document.getElementById('activeTitle').textContent = title;
-            iframe.src = `https://drive.google.com/file/d/${driveId}/preview`;
+            iframe.src = heyzineUrl;
             
             // Scroll to top of viewer if on mobile
             if(window.innerWidth < 768) {
@@ -210,7 +212,7 @@
 
         function hideLoading() {
             const loader = document.getElementById('viewerLoading');
-            const iframe = document.getElementById('cinemaIframe');
+            const iframe = document.getElementById('heyzineIframe');
             if (iframe.src !== "" && iframe.src !== window.location.href) {
                 loader.classList.add('hidden');
                 iframe.classList.remove('opacity-0');
@@ -229,7 +231,8 @@
         window.onload = () => {
             renderGallery();
             // Auto-load first book
-            selectBook(modules[0].driveId, modules[0].title, document.querySelector('.book-thumb-cinema'));
+            const firstBook = modules[0];
+            selectBook(firstBook.heyzineUrl, firstBook.title, document.querySelector('.book-thumb-cinema'));
         };
 
         lucide.createIcons();
